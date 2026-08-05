@@ -21,7 +21,8 @@
 
 # 🔀 FLUXOGRAMA DO SISTEMA
 
-> **Operador envia ao LÍDER → só o Líder manda ao PCP / Qualidade**
+> **Operador envia Diário e R-022 ao LÍDER (pode a qualquer hora).**  
+> **Só o Líder envia ao PCP.**
 
 <br/>
 
@@ -44,9 +45,9 @@ flowchart TB
     L[👤 Login + hora início]
     OF[📋 OF + ID: TAMBOR nº peça]
     U[⚙️ Usinar]
-    R[📐 R-022 — medir peça a peça]
-    P[⏸️ Legendas — parada De / Até<br/>Até pode ficar em aberto]
-    D[📓 Diário — qtd exata boas + sucata]
+    R[📐 R-022 — medir e enviar ao Líder]
+    P[⏸️ Legendas — parada De / Até]
+    D[📓 Diário — qtd boas + sucata]
     F[📄 Folha OF — fica no celular]
     BP[🚪 Bater ponto]
     L --> OF --> U
@@ -61,14 +62,14 @@ flowchart TB
   subgraph LIDER["📱 APK LÍDER"]
     direction TB
     I[📥 Importar XLS / PDF]
-    PCP_BTN[🟢 Enviar PCP]
+    PCP_BTN[🟢 Enviar PCP — SÓ O LÍDER]
     QUAL_BTN[🔵 Enviar Qualidade]
     I --> PCP_BTN
     I --> QUAL_BTN
   end
 
   D -->|"XLS + PDF"| I
-  R -->|"XLS + PDF"| I
+  R -->|"XLS + PDF — ok enviar"| I
   F -.->|"quando salvar"| I
   PCP_BTN ==> PCP[(🏭 PCP)]
   QUAL_BTN ==> QUAL[(✅ Qualidade)]
@@ -76,22 +77,10 @@ flowchart TB
 
 <br/>
 
-```mermaid
-%%{init: {"theme": "base", "themeVariables": { "fontSize": "15px" }}}%%
-flowchart LR
-  A[Operador] -->|Diário| B[Líder]
-  A -->|R-022| B
-  A -->|Folha OF| B
-  B ==>|relatório| C[PCP]
-  B ==>|relatório| D[Qualidade]
-```
-
-<br/>
-
 | Quem | Faz | Destino |
 |------|-----|---------|
-| **Produção** | Salva XLS/PDF | → **Líder** |
-| **Líder** | Enviar PCP | → **PCP** |
+| **Produção** | Diário + **R-022** (ok) | → **Líder** |
+| **Líder** | **Enviar PCP** | → **PCP** (só o líder) |
 | **Líder** | Enviar Qualidade | → **Qualidade** |
 
 ---
@@ -99,8 +88,8 @@ flowchart LR
 ## Turno no tablet
 
 1. Entra → hora + **ID: TAMBOR 534** + OF  
-2. Usina → **R-022** a cada peça  
-3. Parou (empilhadeira etc.) → **Legendas**: De agora, **Até depois** (lápis)  
+2. Usina → **R-022** a cada peça → **pode enviar ao Líder**  
+3. Parou → **Legendas**: De agora, Até depois  
 4. Fim → **Diário** qtd exata → envia ao líder  
 5. **Folha OF** fica no celular  
 6. **Bater ponto** limpa Diário+R-022 · OF permanece  
@@ -110,12 +99,6 @@ flowchart LR
 ## Download
 
 ### [`Tome_Producao.apk`](./Tome_Producao.apk)
-
----
-
-## Stack
-
-Flutter · SQLite · excel · pdf · share_plus · flavor `producao`
 
 ---
 
