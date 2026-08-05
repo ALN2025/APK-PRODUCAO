@@ -99,6 +99,10 @@ flowchart TB
 ### [`Tome_Producao.apk`](./Tome_Producao.apk)
 
 <div align="center">
-<img src="aln.png" alt="Dev A.L.N" height="56"/>
-### Desenvolvido por **Dev A.L.N** · TOME S/A · 2026
+<img src="aln.png" alt="Dev ⩽ A.L.N/⩾" height="56"/>
+
+Desenvolvido por  
+
+### Dev ⩽ A.L.N/⩾
+© 2026 TOME S/A
 </div>
