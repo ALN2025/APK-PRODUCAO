@@ -13,140 +13,103 @@ TOME S/A — Usinagem
 | **Pacote** | `com.tome.producao` |
 | **Público** | Operador no chão de fábrica (tablet compartilhado) |
 | **Irmão** | [APK-LIDER](https://github.com/ALN2025/APK-LIDER) |
+| **Atualização** | 04/08/2026 |
 
 ---
 
-## Visão geral
+## Fluxo do turno (prática)
 
-App **100% offline** que substitui o papel na usinagem:
+```
+1. Entra no app → hora de início + OF / máquina / peça
+2. Começa a usinar → 1ª peça já vai no R-022 (mede o dia todo)
+3. Parou (almoço etc.) → Legendas: De / Até
+   (pode adiantar refeição e limpeza com horário fixo)
+4. Voltou → usina + R-022 de novo
+5. Fim do dia:
+   • Salva R-022 (qtd = peças medidas) → Qualidade
+   • Diário: lança qtd EXATA → XLS + PDF → PCP
+   • Folha OF: preenche e só SALVA (fica no celular)
+6. Bater ponto → fecha o app e limpa o turno
+```
 
-| Módulo | Documento | Destino do PDF/XLS |
-|--------|-----------|-------------------|
-| **Diário** | Produção, paradas, sucata | **PCP** |
-| **R-022** | Cotas críticas do dia | **Qualidade** (planilha diária) |
-| **Ordem** | Folha OF (roteiro Focco) | **Qualidade** (fim da OF — **envio separado**) |
-| **Legendas** | Consulta de códigos | — |
+| Arquivo enviado | Conteúdo | Destino |
+|-----------------|----------|---------|
+| **Diário** XLS/PDF | Quantidade + paradas (Legendas) | **PCP** |
+| **R-022** XLS/PDF | Cotas do dia (qtd real de peças) | **Qualidade** |
+| **Folha OF** XLS/PDF | Roteiro da OF (quando salvar) | **Qualidade** (separado do R-022) |
 
-> Salvar / enviar **não fecha** o app. Só **Bater ponto** (Diário) fecha o aplicativo e limpa o turno.
+> Salvar **não fecha** o app. Só **Bater ponto** fecha e limpa.
 
 ---
 
-## Mapa de fluxo
+## Abas
+
+| Aba | Uso |
+|-----|-----|
+| **Diário** | Fim do turno: qtd exata + botões **XLS** / **PDF** |
+| **R-022** | Durante o dia: mede peça a peça + **XLS** / **PDF** |
+| **Ordem** | Folha OF no celular — lança e salva quando quiser |
+| **Legendas** | Só marcar parada + consultar códigos (**sem** export) |
+
+---
+
+## Mapa
 
 ```mermaid
 flowchart TB
-  login[Login Nome + Setor]
+  login[Login + hora início]
   of[Cadastro OF]
-  tabs[Abas do turno]
+  dia[Durante o dia]
+  fim[Fim do turno]
 
-  login --> of --> tabs
-
-  subgraph producao [APK Produção]
-    diario[Diário]
-    r022[R-022]
-    ordem[Folha OF]
-    legendas[Legendas]
-  end
-
-  tabs --> diario
-  tabs --> r022
-  tabs --> ordem
-  tabs --> legendas
-
-  diario -->|PDF + XLS| pcp[PCP]
-  r022 -->|PDF + XLS dia| qual1[Qualidade]
-  ordem -->|PDF + XLS fim| qual2[Qualidade]
-
-  ponto[Bater ponto]
-  diario --> ponto
-  ponto -->|fecha app + limpa| fim[Fim do turno]
+  login --> of --> dia
+  dia --> r022[R-022 medir]
+  dia --> leg[Legendas parada]
+  dia --> ordem[Folha OF no celular]
+  dia --> fim
+  fim --> diario[Diário qtd exata]
+  diario -->|XLS PDF| pcp[PCP]
+  r022 -->|XLS PDF| qual[Qualidade]
+  ordem -->|salvar| qual
 ```
-
-```
-Cadastro OF
-   ├─ Diário   ──PDF/XLS──► PCP
-   ├─ R-022    ──PDF/XLS──► Qualidade (dia)     ← separado
-   └─ Folha OF ──PDF/XLS──► Qualidade (fim OF)  ← separado
-```
-
-Envio no chão: **Bluetooth / arquivo** (sem WhatsApp no tablet de produção).
 
 ---
 
-## Campos da OF (cadastro)
-
-| Campo | Obrigatório | Onde pega no papel |
-|-------|-------------|--------------------|
-| Máquina | Sim | Número do torno (ex.: 24, 1507) |
-| ID / Código da peça | Sim | Item (ex.: T-144) |
-| **Ordem de usinagem** | Sim | **OF** no cabeçalho (ex.: 125560) |
-| Ordem de fundição | Não | Se houver |
-| **Nº Documento / Barras** | Não | Código de barras no **topo** da “Emissão de Ordem de Fabricação” (ex.: `*484693*`). Se não souber, **deixe em branco** |
-| Instrumentos R-022 | — | Micrômetro / RC |
-
----
-
-## Stack tecnológica
+## Stack
 
 | Camada | Tecnologia |
 |--------|------------|
-| UI | **Flutter** (Material 3), Dart 3 |
-| Persistência | **SQLite** (`sqflite`) |
-| Export Excel | **excel** (`.xlsx`) |
-| Export PDF | **pdf** + fontes **Noto Sans** (acentos) |
-| Compartilhar | **share_plus**, Bluetooth / arquivo |
-| Arquivos | **path_provider**, **file_picker** |
-| QR | **qr_flutter** |
-| Ícones | Material Icons |
-| Build Android | Flavors `producao` / `lider` (`--dart-define=FLAVOR=`) |
-
-### Dependências principais
-
-```
-flutter / dart
-sqflite · path · path_provider
-share_plus · file_picker
-pdf · excel · intl · qr_flutter
-```
+| UI | Flutter / Dart 3 (Material 3) |
+| Banco | SQLite (`sqflite`) |
+| Excel | `excel` (.xlsx) |
+| PDF | `pdf` + Noto Sans |
+| Envio | `share_plus` (Bluetooth / arquivo) |
+| Flavor | `producao` (`com.tome.producao`) |
 
 ---
 
 ## Instalação
 
-1. Desinstale a versão anterior.
-2. Permita instalar apps desconhecidos.
-3. Instale [`Tome_Producao.apk`](./Tome_Producao.apk).
-4. Nome + Setor → preencha OF → use as abas.
-
-Arquivos gerados: pasta `Download/Tome` (quando possível) e área do app.
+1. Desinstale a versão antiga.  
+2. Instale [`Tome_Producao.apk`](./Tome_Producao.apk).  
 
 ---
 
 ## Compilar
 
 ```bash
-cd tome_producao
-flutter pub get
 flutter build apk --release --flavor producao --dart-define=FLAVOR=producao
 ```
-
-Saída: `build/app/outputs/flutter-apk/app-producao-release.apk`
 
 ---
 
 ## Assinatura
-
-Rodapé do aplicativo:
 
 <p align="center">
   <img src="aln.png" alt="Dev A.L.N" height="48"/>
 </p>
 
 <p align="center"><b>Dev A.L.N</b> · TOME S/A · 2026</p>
-
----
-
-## Repositórios
 
 - Produção: https://github.com/ALN2025/APK-PRODUCAO  
 - Líder: https://github.com/ALN2025/APK-LIDER  
